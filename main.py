@@ -40,23 +40,23 @@ class underground:
             source = f.read()
 
         failed_source = pipe.get_failed_function_source(
-                    source
+            source
         )
-        
+
         print(
             "===== FAILED FUNCTION ====="
         )
-        
+
         print(
-                failed_source
+            failed_source
         )
-        
+
         print(
             "===== END FAILED FUNCTION ====="
         )
 
         prompt = pipe.get_ai_prompt(
-        source
+            source
         )
 
         response = requests.post(
@@ -75,9 +75,9 @@ class underground:
             "response"
         ]
 
-        generated_code = generated_code.strip()
-
-
+        #
+        # KI-Ausgabe bereinigen
+        #
         generated_code = generated_code.strip()
 
         generated_code = generated_code.replace(
@@ -88,32 +88,17 @@ class underground:
         generated_code = generated_code.replace(
             "</code>",
             ""
-        ).strip()
-
-        new_source = pipe.replace_failed_function(
-        source,
-        generated_code
         )
-        # if not generated_code.startswith(
-        #     "from "
-        # ):
-        #     print(
-        #         "Antwort beginnt nicht mit Python-Code"
-        #     )
-        #     return False
 
-        if generated_code.startswith(
-            "```python"
-        ):
-            generated_code = generated_code[
-                len("```python"):
-            ].strip()
+        generated_code = generated_code.replace(
+            "```python",
+            ""
+        )
 
-        if generated_code.endswith(
-            "```"
-        ):
-            generated_code = generated_code[:-3].strip()
-
+        generated_code = generated_code.replace(
+            "```",
+            ""
+        ).strip()
 
         print(
             "===== AI RESPONSE ====="
@@ -126,76 +111,24 @@ class underground:
         print(
             "===== END AI RESPONSE ====="
         )
+
+        #
+        # ERST JETZT Patch einsetzen
+        #
+        new_source = pipe.replace_failed_function(
+            source,
+            generated_code
+        )
+
         with open(
             "last_ai_response.txt",
             "w",
             encoding="utf-8"
         ) as f:
 
-            f.write(generated_code)
-
-        #
-        # Syntaxprüfung
-        #
-        try:
-
-            # compile(
-            #     generated_code,
-            #     module_file,
-            #     "exec"
-            # )
-
-            with open(
-                "generated_module.py",
-                "w",
-                encoding="utf-8"
-                ) as f:
-
-                f.write(new_source)
-
-            compile(
-                new_source,
-                module_file,
-                "exec"
-)
-
-        except Exception as ex:
-
-            print(
-                "KI hat ungültigen Python-Code geliefert:"
-            )
-
-            print(ex)
-
-            return False
-
-        #
-        # Modul überschreiben
-        #
-
-        #muss ersetzt werden
-        with open(
-            "generated_patch.py",
-            "w",
-            encoding="utf-8"
-        ) as f:
-
             f.write(
-        generated_code
-        )
-
-
-        #HIERMIT ERSETZEN
-        # with open(
-        #     module_file,
-        #     "w",
-        #     encoding="utf-8"
-        # ) as f:
-
-        #     f.write(
-        #         new_source
-        #)
-
+                generated_code
+            )
 
         with open(
             "generated_module.py",
@@ -207,21 +140,33 @@ class underground:
                 new_source
             )
 
-    #komplettes MODUL ÜBERSCHREIBEN
-        # with open(
-        #     module_file,
-        #     "w",
-        #     encoding="utf-8"
-        # ) as f:
+        #
+        # Gesamte Datei prüfen
+        #
+        try:
 
-        #     f.write(
-        #         generated_code
-        #     )
+            compile(
+                new_source,
+                module_file,
+                "exec"
+            )
+
+        except Exception as ex:
+
+            print(
+                "KI hat ungültigen Python-Code geliefert:"
+            )
+
+            print(
+                ex
+            )
+
+            return False
 
         print(
             "Patch gespeichert:",
             os.path.abspath(
-                "generated_patch.py"
+                "generated_module.py"
             )
         )
 
