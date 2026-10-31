@@ -31,13 +31,29 @@ class underground:
             pipe.__class__
         )
 
-        with open(
-            module_file,
-            "r",
-            encoding="utf-8"
-        ) as f:
+        current_source_file = (
+            "generated_module.py"
+        )
 
-            source = f.read()
+        if os.path.exists(
+            current_source_file
+        ):
+            with open(
+                current_source_file,
+                "r",
+                encoding="utf-8"
+            ) as f:
+
+                source = f.read()
+
+        else:
+            with open(
+                module_file,
+                "r",
+                encoding="utf-8"
+            ) as f:
+
+                source = f.read()
 
         failed_source = pipe.get_failed_function_source(
             source
