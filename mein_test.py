@@ -270,7 +270,7 @@ class datapipe_1(i_dataflow):
             
         super().__init__()
         # ERROR_MEMORY_START
-        self.error_memory = [{'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T18:18:18.145165', 'line': 234, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 234, in wrapper\n    result = func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 286, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n', 'status': 'fixed', 'fixed_at': '2026-10-31T18:18:18.147015'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T18:20:46.796926', 'line': 234, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 234, in wrapper\n    result = func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 286, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n', 'status': 'fixed', 'fixed_at': '2026-10-31T18:20:46.799100'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T18:23:31.125248', 'line': 234, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 234, in wrapper\n    result = func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 286, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n', 'status': 'fixed', 'fixed_at': '2026-10-31T18:23:31.126649'}]
+        self.error_memory = []
         # ERROR_MEMORY_END
     
     @i_dataflow.track_errors
@@ -290,7 +290,7 @@ class datapipe_2(i_dataflow):
     def __init__(self):
         super().__init__()
         # ERROR_MEMORY_START
-        self.error_memory = [{'pipe_id': 'pipe_002', 'version': '0', 'class_name': 'datapipe_2', 'module': 'mein_test', 'function': 'test2', 'error_type': 'ValueError', 'error_message': 'TEST2_ERROR', 'timestamp': '2026-10-31T18:20:51.321440', 'line': 234, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 234, in wrapper\n    result = func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 302, in test2\n    raise ValueError("TEST2_ERROR")\nValueError: TEST2_ERROR\n', 'status': 'fixed', 'fixed_at': '2026-10-31T18:20:51.323083'}, {'pipe_id': 'pipe_002', 'version': '0', 'class_name': 'datapipe_2', 'module': 'mein_test', 'function': 'test2', 'error_type': 'ValueError', 'error_message': 'TEST2_ERROR', 'timestamp': '2026-10-31T18:23:39.636840', 'line': 234, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 234, in wrapper\n    result = func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 302, in test2\n    raise ValueError("TEST2_ERROR")\nValueError: TEST2_ERROR\n', 'status': 'fixed', 'fixed_at': '2026-10-31T18:23:39.638380'}]
+        self.error_memory = []
         # ERROR_MEMORY_END
     @i_dataflow.track_errors
     def test1(self):
