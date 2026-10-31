@@ -31,15 +31,21 @@ class i_dataflow(ABC):
 
         {self.ki_guidlines}
 
-        WICHTIG:
-
-        Die Marker
-
+        WICHTIG:  Die Marker
+        
         # ERROR_MEMORY_START
         # ERROR_MEMORY_END
-
+        
         dürfen niemals entfernt,
         verschoben oder verändert werden.
+
+        Du darfst keine neuen globalen Variablen erzeugen.
+
+        Du darfst keinen Code außerhalb vorhandener Klassen schreiben.
+
+        Du darfst keinen Code außerhalb vorhandener Funktionen schreiben.
+
+        Verändere ausschließlich die Funktion, die den Fehler verursacht hat.
 
         last_error = self.error_memory[-1]
 
