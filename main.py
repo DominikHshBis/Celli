@@ -145,6 +145,14 @@ class underground:
             #     "exec"
             # )
 
+            with open(
+                "generated_module.py",
+                "w",
+                encoding="utf-8"
+                ) as f:
+
+                f.write(new_source)
+
             compile(
                 new_source,
                 module_file,
@@ -186,7 +194,7 @@ class underground:
 
         #     f.write(
         #         new_source
-    )
+        #)
 
 
         with open(
