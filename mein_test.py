@@ -41,15 +41,30 @@ class i_dataflow(ABC):
         dürfen niemals entfernt,
         verschoben oder verändert werden.
 
+        last_error = self.error_memory[-1]
+
         LETZTER FEHLER:
 
-        {self.error_memory[-1]}
+        Funktion:
+        {last_error['function']}
 
-        AKTUELLER CODE:
+        Typ:
+        {last_error['error_type']}
 
-        {source}
+        Meldung:
+        {last_error['error_message']}
+
+        Traceback:
+        {last_error['traceback']}
+
+        Die genannte Funktion verursacht aktuell den Fehler.
+
+        Ändere die Logik dieser Funktion so,
+        dass dieser Fehler nicht mehr auftreten kann.
+
+        Gib ausschließlich Python-Code zurück.
+        
         """
-
 
     def track_error(self, func_name, exc):
         error = {
@@ -95,7 +110,7 @@ class datapipe_1(i_dataflow):
             
         super().__init__()
         # ERROR_MEMORY_START
-        self.error_memory = []
+        self.error_memory = [{'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:35:04.078807', 'line': 76, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 76, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 111, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}]
         # ERROR_MEMORY_END
     
     @i_dataflow.track_errors
