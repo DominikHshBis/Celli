@@ -1,0 +1,6 @@
+def test2(self):
+    try:
+        print("pipe2:", "test2")
+        raise ValueError("TEST2_ERROR")
+    except ValueError as e:
+        print(f"An error occurred in test2: {e}")

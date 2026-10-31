@@ -190,18 +190,52 @@ class underground:
 
     def reload_pipe(self, pipe):
 
-        module_name = pipe.__class__.__module__
+        module_path = os.path.abspath(
+        "generated_module.py"
+        )
 
-        module = sys.modules[module_name]
+        spec = importlib.util.spec_from_file_location(
+            "generated_module",
+            module_path
+        )
 
-        importlib.reload(module)
+        module = importlib.util.module_from_spec(
+            spec
+        )
+
+        spec.loader.exec_module(
+            module
+        )
 
         new_class = getattr(
             module,
             pipe.__class__.__name__
         )
-        print( "Reload Modul:", pipe.__class__.__module__)
+
+        print(
+            "Reload Modul:",
+            module.__name__
+        )
+
+        # print(
+        #     inspect.getfile(new_class)
+        # )
+
         return new_class()
+
+        # module_name = pipe.__class__.__module__
+
+        # module = sys.modules[module_name]
+
+        # importlib.reload(module)
+
+        # new_class = getattr(
+        #     module,
+        #     pipe.__class__.__name__
+        # )
+        # print( "Reload Modul:", pipe.__class__.__module__)
+        # print( inspect.getfile(new_class))
+        # return new_class()
 
     def inject_error_into_module(
         self,
@@ -342,6 +376,17 @@ class underground:
         ) as f:
 
             errors = json.load(f)
+
+        #
+        # letzten Fehler als erledigt markieren
+        #
+        if errors:
+
+            errors[-1]["status"] = "fixed"
+
+            errors[-1]["fixed_at"] = (
+                datetime.utcnow().isoformat()
+            )
 
         success = self.inject_error_into_module(
             pipe,
