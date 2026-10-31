@@ -39,8 +39,6 @@ class i_dataflow(ABC):
         dürfen niemals entfernt,
         verschoben oder verändert werden.
 
-        Du darfst keine neuen globalen Variablen erzeugen.
-
         Du darfst keinen Code außerhalb vorhandener Klassen schreiben.
 
         Du darfst keinen Code außerhalb vorhandener Funktionen schreiben.
@@ -116,7 +114,7 @@ class datapipe_1(i_dataflow):
             
         super().__init__()
         # ERROR_MEMORY_START
-        self.error_memory = [{'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:35:04.078807', 'line': 76, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 76, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 111, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}]
+        self.error_memory = [{'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:35:04.078807', 'line': 76, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 76, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 111, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:45:42.667883', 'line': 97, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 97, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 132, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}]
         # ERROR_MEMORY_END
     
     @i_dataflow.track_errors

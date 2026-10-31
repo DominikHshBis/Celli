@@ -60,6 +60,16 @@ class underground:
 
         generated_code = generated_code.strip()
 
+        generated_code = generated_code.strip()
+
+        if not generated_code.startswith(
+            "from "
+        ):
+            print(
+                "Antwort beginnt nicht mit Python-Code"
+            )
+            return False
+
         if generated_code.startswith(
             "```python"
         ):
