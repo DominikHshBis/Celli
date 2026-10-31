@@ -89,6 +89,11 @@ class underground:
             "</code>",
             ""
         ).strip()
+
+        new_source = pipe.replace_failed_function(
+        source,
+        generated_code
+        )
         # if not generated_code.startswith(
         #     "from "
         # ):
@@ -134,11 +139,17 @@ class underground:
         #
         try:
 
+            # compile(
+            #     generated_code,
+            #     module_file,
+            #     "exec"
+            # )
+
             compile(
-                generated_code,
+                new_source,
                 module_file,
                 "exec"
-            )
+)
 
         except Exception as ex:
 
@@ -154,6 +165,7 @@ class underground:
         # Modul überschreiben
         #
 
+        #muss ersetzt werden
         with open(
             "generated_patch.py",
             "w",
@@ -163,6 +175,29 @@ class underground:
             f.write(
         generated_code
         )
+
+
+        #HIERMIT ERSETZEN
+        # with open(
+        #     module_file,
+        #     "w",
+        #     encoding="utf-8"
+        # ) as f:
+
+        #     f.write(
+        #         new_source
+    )
+
+
+        with open(
+            "generated_module.py",
+            "w",
+            encoding="utf-8"
+        ) as f:
+
+            f.write(
+                new_source
+            )
 
     #komplettes MODUL ÜBERSCHREIBEN
         # with open(
