@@ -9,6 +9,7 @@ import importlib
 import random
 import time
 from functools import wraps
+import ast
 
 class i_dataflow(ABC):
     pipe_id = "pipe_001"
@@ -21,54 +22,171 @@ class i_dataflow(ABC):
 
     def get_ai_prompt(self, source):
 
-        last_error = (
-        self.error_memory[-1]
-        if self.error_memory
-        else "Kein Fehler vorhanden"
+        
+
+        failed_source = self.get_failed_function_source(
+            source
         )
+
+        last_error = (
+            self.error_memory[-1]
+            if self.error_memory
+            else "Kein Fehler vorhanden"
+        )
+
         return f"""
+            {self.ki_guidlines}
+
+            FEHLERHAFTE FUNKTION:
+
+            {failed_source}
+
+            LETZTER FEHLER:
+
+            {last_error}
+
+            Gib ausschließlich die korrigierte Funktion zurück.
+
+            Keine Erklärungen.
+            Kein Markdown.
+            Keine Kommentare.
+            Keinen weiteren Code.
+            """
 
 
-        {self.ki_guidlines}
+        # last_error = (
+        # self.error_memory[-1]
+        # if self.error_memory
+        # else "Kein Fehler vorhanden"
+        # )
+        # return f"""
 
-        WICHTIG:  Die Marker
+
+        # {self.ki_guidlines}
+
+        # WICHTIG:  
         
-        # ERROR_MEMORY_START
-        # ERROR_MEMORY_END
+        # Die Marker
         
-        dürfen niemals entfernt,
-        verschoben oder verändert werden.
+        # # ERROR_MEMORY_START
+        # # ERROR_MEMORY_END
 
-        Du darfst keinen Code außerhalb vorhandener Klassen schreiben.
+        # dürfen niemals entfernt,
+        # verschoben oder verändert werden.
 
-        Du darfst keinen Code außerhalb vorhandener Funktionen schreiben.
+        # nichts erklären,  gib bitte nur den code zurück
 
-        Verändere ausschließlich die Funktion, die den Fehler verursacht hat.
+        # Antworte ausschließlich im Format:
 
-        last_error = self.error_memory[-1]
+        # <code>
+        # ...
+        # </code>
 
-        LETZTER FEHLER:
+        # Kein Text vor <code>.
+        # Kein Text nach </code>.
 
-        Funktion:
-        {last_error['function']}
+        # Der Fehler darf nicht lediglich unterdrückt werden.
 
-        Typ:
-        {last_error['error_type']}
+        # Die Ursache des Fehlers ist zu beheben.
 
-        Meldung:
-        {last_error['error_message']}
+        # try/except Blöcke dürfen nur eingesetzt werden,
+        # wenn sie die Ursache tatsächlich beseitigen.
 
-        Traceback:
-        {last_error['traceback']}
+        # Das bloße Abfangen einer Exception gilt nicht als Reparatur.
 
-        Die genannte Funktion verursacht aktuell den Fehler.
+        # Du darfst keinen Code außerhalb vorhandener Klassen schreiben.
 
-        Ändere die Logik dieser Funktion so,
-        dass dieser Fehler nicht mehr auftreten kann.
+        # Du darfst keinen Code außerhalb vorhandener Funktionen schreiben.
 
-        Gib ausschließlich Python-Code zurück.
+        # Verändere ausschließlich die Funktion, die den Fehler verursacht hat.
+
+        # last_error = self.error_memory[-1]
+
+        # LETZTER FEHLER:
+
+        # Funktion:
+        # {last_error['function']}
+
+        # Typ:
+        # {last_error['error_type']}
+
+        # Meldung:
+        # {last_error['error_message']}
+
+        # Traceback:
+        # {last_error['traceback']}
+
+        # Die genannte Funktion verursacht aktuell den Fehler.
+
+        # Ändere die Logik dieser Funktion so,
+        # dass dieser Fehler nicht mehr auftreten kann.
+
+        # Gib ausschließlich Python-Code zurück.
+
+        # Gib ausschließlich die korrigierte Funktion zurück.
+
+        # Beispiel:
+
+        # def test3(self):
+        #     ...
+
+        # Keinen weiteren Code.
+        # Keine Klassen.
+        # Keine Erklärungen.
         
-        """
+        # """
+
+
+
+
+    def get_failed_function(self, source):
+
+        if not self.error_memory:
+            return None
+
+        func_name = self.error_memory[-1][
+            "function"
+        ]
+
+        tree = ast.parse(source)
+
+        for node in ast.walk(tree):
+
+            if (
+                isinstance(
+                    node,
+                    ast.FunctionDef
+                )
+                and node.name == func_name
+            ):
+
+                return {
+                    "name": node.name,
+                    "start": node.lineno,
+                    "end": node.end_lineno
+                }
+
+        return None
+
+    def get_failed_function_source(
+        self,
+        source
+        ):
+        info = self.get_failed_function(
+            source
+        )
+
+        if not info:
+            return None
+
+        lines = source.splitlines()
+
+        return "\n".join(
+            lines[
+                info["start"]-1:
+                info["end"]
+            ]
+        )
 
     def track_error(self, func_name, exc):
         error = {
@@ -114,7 +232,7 @@ class datapipe_1(i_dataflow):
             
         super().__init__()
         # ERROR_MEMORY_START
-        self.error_memory = [{'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:35:04.078807', 'line': 76, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 76, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 111, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:45:42.667883', 'line': 97, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 97, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 132, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}]
+        self.error_memory = [{'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:35:04.078807', 'line': 76, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 76, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 111, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:45:42.667883', 'line': 97, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 97, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 132, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:50:42.602997', 'line': 95, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 95, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 130, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:51:45.919000', 'line': 95, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 95, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 130, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:54:33.715624', 'line': 106, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 106, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 141, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:57:21.550933', 'line': 108, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 108, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 143, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T15:58:25.432391', 'line': 108, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 108, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 143, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T16:10:30.637481', 'line': 119, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 119, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 154, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}, {'pipe_id': 'pipe_001', 'version': '0', 'class_name': 'datapipe_1', 'module': 'mein_test', 'function': 'test3', 'error_type': 'ValueError', 'error_message': 'TEST3_ERROR', 'timestamp': '2026-10-31T16:11:19.661840', 'line': 119, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 119, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 154, in test3\n    raise ValueError("TEST3_ERROR")\nValueError: TEST3_ERROR\n'}]
         # ERROR_MEMORY_END
     
     @i_dataflow.track_errors
@@ -134,7 +252,7 @@ class datapipe_2(i_dataflow):
     def __init__(self):
         super().__init__()
         # ERROR_MEMORY_START
-        self.error_memory = []
+        self.error_memory = [{'pipe_id': 'pipe_002', 'version': '0', 'class_name': 'datapipe_2', 'module': 'mein_test', 'function': 'test2', 'error_type': 'ValueError', 'error_message': 'TEST2_ERROR', 'timestamp': '2026-10-31T16:10:46.894451', 'line': 119, 'traceback': 'Traceback (most recent call last):\n  File "/workspaces/Celli/mein_test.py", line 119, in wrapper\n    return func(self, *args, **kwargs)\n  File "/workspaces/Celli/mein_test.py", line 170, in test2\n    raise ValueError("TEST2_ERROR")\nValueError: TEST2_ERROR\n'}]
         # ERROR_MEMORY_END
     @i_dataflow.track_errors
     def test1(self):

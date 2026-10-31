@@ -11,6 +11,7 @@ import random
 import time
 import inspect
 import requests
+import ast
 
 
 class underground:
@@ -38,6 +39,22 @@ class underground:
 
             source = f.read()
 
+        failed_source = pipe.get_failed_function_source(
+                    source
+        )
+        
+        print(
+            "===== FAILED FUNCTION ====="
+        )
+        
+        print(
+                failed_source
+        )
+        
+        print(
+            "===== END FAILED FUNCTION ====="
+        )
+
         prompt = pipe.get_ai_prompt(
         source
         )
@@ -60,15 +77,25 @@ class underground:
 
         generated_code = generated_code.strip()
 
+
         generated_code = generated_code.strip()
 
-        if not generated_code.startswith(
-            "from "
-        ):
-            print(
-                "Antwort beginnt nicht mit Python-Code"
-            )
-            return False
+        generated_code = generated_code.replace(
+            "<code>",
+            ""
+        )
+
+        generated_code = generated_code.replace(
+            "</code>",
+            ""
+        ).strip()
+        # if not generated_code.startswith(
+        #     "from "
+        # ):
+        #     print(
+        #         "Antwort beginnt nicht mit Python-Code"
+        #     )
+        #     return False
 
         if generated_code.startswith(
             "```python"
@@ -126,22 +153,36 @@ class underground:
         #
         # Modul überschreiben
         #
+
         with open(
-            module_file,
+            "generated_patch.py",
             "w",
             encoding="utf-8"
         ) as f:
 
             f.write(
-                generated_code
-            )
+        generated_code
+        )
+
+    #komplettes MODUL ÜBERSCHREIBEN
+        # with open(
+        #     module_file,
+        #     "w",
+        #     encoding="utf-8"
+        # ) as f:
+
+        #     f.write(
+        #         generated_code
+        #     )
 
         print(
-            "KI-Reparatur gespeichert"
+            "Patch gespeichert:",
+            os.path.abspath(
+                "generated_patch.py"
+            )
         )
 
         return True
-
 
     def reload_pipe(self, pipe):
 
