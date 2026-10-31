@@ -10,6 +10,7 @@ import importlib
 import random
 import time
 import inspect
+import requests
 
 
 class underground:
@@ -22,6 +23,115 @@ class underground:
         self.secondary = secondary
 
         self.active_pipe = primary
+    
+    def ask_ai_to_fix(self, pipe):
+
+        module_file = inspect.getfile(
+            pipe.__class__
+        )
+
+        with open(
+            module_file,
+            "r",
+            encoding="utf-8"
+        ) as f:
+
+            source = f.read()
+
+        prompt = pipe.get_ai_prompt(
+        source
+        )
+
+        response = requests.post(
+            "https://ollama.hshbot.de/api/generate",
+            json={
+                "model": "deepseek-coder-v2:16b",
+                "prompt": prompt,
+                "stream": False
+            },
+            timeout=600
+        )
+
+        response.raise_for_status()
+
+        generated_code = response.json()[
+            "response"
+        ]
+
+        generated_code = generated_code.strip()
+
+        if generated_code.startswith(
+            "```python"
+        ):
+            generated_code = generated_code[
+                len("```python"):
+            ].strip()
+
+        if generated_code.endswith(
+            "```"
+        ):
+            generated_code = generated_code[:-3].strip()
+
+
+        print(
+            "===== AI RESPONSE ====="
+        )
+
+        print(
+            generated_code[:5000]
+        )
+
+        print(
+            "===== END AI RESPONSE ====="
+        )
+        with open(
+            "last_ai_response.txt",
+            "w",
+            encoding="utf-8"
+        ) as f:
+
+            f.write(generated_code)
+
+        #
+        # Syntaxprüfung
+        #
+        try:
+
+            compile(
+                generated_code,
+                module_file,
+                "exec"
+            )
+
+        except Exception as ex:
+
+            print(
+                "KI hat ungültigen Python-Code geliefert:"
+            )
+
+            print(ex)
+
+            return False
+
+        #
+        # Modul überschreiben
+        #
+        with open(
+            module_file,
+            "w",
+            encoding="utf-8"
+        ) as f:
+
+            f.write(
+                generated_code
+            )
+
+        print(
+            "KI-Reparatur gespeichert"
+        )
+
+        return True
+
 
     def reload_pipe(self, pipe):
 
@@ -199,6 +309,18 @@ class underground:
             "KI erhält aktualisierten "
             "Klassenquelltext"
         )
+
+        success = self.ask_ai_to_fix(
+            pipe
+        )
+
+        if not success:
+
+            print(
+                "KI-Reparatur fehlgeschlagen"
+            )
+
+            return
 
         new_pipe = self.reload_pipe(
             pipe
