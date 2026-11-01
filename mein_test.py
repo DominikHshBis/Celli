@@ -1,17 +1,56 @@
-from abc import ABC, abstractmethod
+from abc import ABCMeta, ABC, abstractmethod
 from datetime import datetime
 import traceback
 import json
-import re
-import os
-import sys
-import importlib
-import random
-import time
+
 from functools import wraps
 import ast
 
-class i_dataflow(ABC):
+class Auto_Track_Meta(ABCMeta):
+
+    def __new__(cls, name, bases, attrs):
+
+        if name == "i_dataflow":
+            return super().__new__(
+                cls,
+                name,
+                bases,
+                attrs
+            )
+
+        base_methods = set()
+
+        for base in bases:
+            base_methods.update(
+                base.__dict__.keys()
+            )
+
+        new_cls = super().__new__(
+            cls,
+            name,
+            bases,
+            attrs
+        )
+
+        for key, value in attrs.items():
+
+            if (
+                callable(value)
+                and not key.startswith("_")
+                and key not in base_methods
+            ):
+
+                setattr(
+                    new_cls,
+                    key,
+                    new_cls.track_errors(
+                        value
+                    )
+                )
+
+        return new_cls
+class i_dataflow(ABC,metaclass=Auto_Track_Meta):
+
     pipe_id = ""
     version = "0"
     
@@ -75,7 +114,6 @@ class i_dataflow(ABC):
             dass die Funktion erfolgreich beendet wird.
 
             """
-
 
     def replace_failed_function(
         self,
@@ -254,15 +292,15 @@ class i_dataflow(ABC):
                 raise
         return wrapper
     
-    @abstractmethod
-    def test1(self):
-        pass
-    @abstractmethod
-    def test2(self):
-        pass
-    @abstractmethod
-    def test3(self):
-        pass
+    # @abstractmethod
+    # def test1(self):
+    #     pass
+    # @abstractmethod
+    # def test2(self):
+    #     pass
+    # @abstractmethod
+    # def test3(self):
+    #     pass
 
 class datapipe_1(i_dataflow):
     pipe_id = "pipe_001"
@@ -273,15 +311,12 @@ class datapipe_1(i_dataflow):
         self.error_memory = []
         # ERROR_MEMORY_END
     
-    @i_dataflow.track_errors
     def test1(self):
         print("pipe1:", "test1")
-
-    @i_dataflow.track_errors
+    
     def test2(self):
         print("pipe1:", "test2")
-
-    @i_dataflow.track_errors
+    
     def test3(self):
         raise ValueError("TEST3_ERROR")
         
@@ -292,15 +327,13 @@ class datapipe_2(i_dataflow):
         # ERROR_MEMORY_START
         self.error_memory = []
         # ERROR_MEMORY_END
-    @i_dataflow.track_errors
+   
     def test1(self):
         print("pipe2:","test1")
 
-    @i_dataflow.track_errors
     def test2(self):
         print("pipe2:","test2")
         raise ValueError("TEST2_ERROR")
     
-    @i_dataflow.track_errors
     def test3(self):
         print("pipe2:","test3")
